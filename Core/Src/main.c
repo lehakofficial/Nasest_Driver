@@ -179,25 +179,16 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) // колбек по захвату
 uint64_t count_64_1 = 0;
 uint64_t count_64_2 = 0;
 
-uint8_t pwm_flag = 0;	
-
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	// GPIOA->ODR |= 0x20;//Для настройки на отладке!!!
   if(htim->Instance == TIM1) //проверяем какой таймер вызвал колбек
    {
-		if (duty_cycle == 0 && pwm_flag != 0)	// turn off PWM for 0 state on both channels
-		{
-			HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_3);
-			HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_3);
-			pwm_flag = 0;
-		}
-		else if(duty_cycle != 0 && pwm_flag == 0)	// turn on PWM
-		{
-			HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-			HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-			pwm_flag = 1;
-		}
+		if (duty_cycle == 0)
+			TIM1->CCER &= ~(TIM_CCER_CC1NE | TIM_CCER_CC1E); 	// turn off PWM for 0 state on both channels
+		else if(duty_cycle != 0)	
+			TIM1->CCER |= TIM_CCER_CC1NE | TIM_CCER_CC1E; 		// turn on PWM
+		
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, duty_cycle);
 		
 		//Софтовый запуск АЦП
@@ -555,8 +546,8 @@ __HAL_TIM_CLEAR_FLAG(&htim1, TIM_SR_UIF); // очищаем флаг
   HAL_TIM_Base_Start_IT(&htim1);
 
 	//Запускаем PWM
-  HAL_TIM_PWM_Start (&htim1, TIM_CHANNEL_3);
-  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+//  HAL_TIM_PWM_Start (&htim1, TIM_CHANNEL_3);
+//  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
 	
 	//Запуск таймера захвата ШИМ внешнего управления
 	HAL_TIM_IC_Start_IT(&htim17, TIM_CHANNEL_1);
