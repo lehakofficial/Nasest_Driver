@@ -270,8 +270,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)	{
 					duty_cycle = PWM_ZERO;	//Вырождаем ШИМ
 				else {
 					//Расчет фильтров калибровки осреднением
-					v_adc_offset += adc[0];
-					i_adc_offset += adc[1];
+					v_adc_offset += adc[1];
+					i_adc_offset += adc[0];
 					//Проверка на завершение режима стартовой калибровки АЦП
 					if (count_start_adc >= COUNT_ADC_CALIBRATE)	{
 						count_start_adc = 0;	//Сброс счетчика калибровки АЦП для следующего цикла
@@ -294,9 +294,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)	{
 				i_adc = i_adc - (i_adc >> 6) + (adc[1] << 14);
 				i_adc_filtr = i_adc >> 20;*/
 				//Небольшая фильтрация входа ацп тока и напряжения при 25 кГц вызова полоса примерно 1000 Гц
-				v_adc = v_adc - (v_adc >> 4) + (adc[0] << 16);
+				v_adc = v_adc - (v_adc >> 4) + (adc[1] << 16);
 				v_adc_filtr = v_adc >> 20;
-				i_adc = i_adc - (i_adc >> 4) + (adc[1] << 16);
+				i_adc = i_adc - (i_adc >> 4) + (adc[0] << 16);
 				i_adc_filtr = i_adc >> 20;
 
 				//Сохраняем старое значение АЦП напряжения для расчета производной
@@ -360,9 +360,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)	{
 //Режим работы стабилизации тока DC/DC			******************************************************************************
 				case CURRENT_DC:
 					//Небольшая фильтрация входа ацп тока и напряжения при 25 кГц вызова полоса примерно 1000 Гц
-					v_adc = v_adc - (v_adc >> 4) + (adc[0] << 16);
+					v_adc = v_adc - (v_adc >> 4) + (adc[1] << 16);
 					v_adc_filtr = v_adc >> 20;
-					i_adc = i_adc - (i_adc >> 4) + (adc[1] << 16);
+					i_adc = i_adc - (i_adc >> 4) + (adc[0] << 16);
 					i_adc_filtr = i_adc >> 20;
 				
 					//Сохраняем старое значение АЦП напряжения для расчета производной
@@ -427,9 +427,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)	{
 					i_adc = i_adc - (i_adc >> 6) + (adc[1] << 14);
 					i_adc_filtr = i_adc >> 20;*/
 					//Небольшая фильтрация входа ацп тока и напряжения при 25 кГц вызова полоса примерно 1000 Гц
-					v_adc = v_adc - (v_adc >> 4) + (adc[0] << 16);
+					v_adc = v_adc - (v_adc >> 4) + (adc[1] << 16);
 					v_adc_filtr = v_adc >> 20;
-					i_adc = i_adc - (i_adc >> 4) + (adc[1] << 16);
+					i_adc = i_adc - (i_adc >> 4) + (adc[0] << 16);
 					i_adc_filtr = i_adc >> 20;
 				
 					//Сохраняем старое значение АЦП напряжения для расчета производной
